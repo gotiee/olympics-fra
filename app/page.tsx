@@ -8,7 +8,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -18,60 +17,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Rings, TailSpin } from "react-loader-spinner";
+import { TailSpin } from "react-loader-spinner";
 import { Input } from "@/components/ui/input";
-import { Check, Clock } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-
-// Les interfaces et le code pour obtenir l'URL des icônes sont les mêmes
-// Définition des interfaces et de la fonction getIconUrl
-
-interface Competitor {
-  code: string;
-  noc: string;
-  name: string;
-  order: number;
-  results: {
-    position: string;
-    mark: string;
-    winnerLoserTie: string;
-    medalType: string;
-    irm: string;
-  };
-}
-
-interface EventUnit {
-  id: string;
-  disciplineName: string;
-  eventUnitName: string;
-  startDate: string;
-  venueDescription: string;
-  statusDescription: string;
-  disciplineCode: string;
-  competitors: Competitor[];
-}
+import { Event, EventStatus } from "@/interfaces/Event";
+import { EventCard } from "@/components/ui/event-card";
 
 interface SportsResponse {
-  units: EventUnit[];
-}
-
-interface IconContent {
-  id: string;
-  entityId: string;
-  name: string;
-  url: string;
-  odfCode: string;
-  pictogram: string;
-}
-
-interface IconModule {
-  content: IconContent[];
+  units: Event[];
 }
 
 export default function Home() {
   const {
     data: sports,
-    error: sportsError,
     isLoading: isLoadingSports,
     isValidating: isValidatingSports,
   } = useSWR<SportsResponse>(process.env.NEXT_PUBLIC_API, fetcher, {
@@ -90,21 +48,11 @@ export default function Home() {
 
   const initialSearchTerm = searchParams.get("search") ?? "";
   const initialStatusFilter =
-    (searchParams.get("status") as
-      | "All"
-      | "En cours"
-      | "Terminée"
-      | "Interruption programmée"
-      | "En préparation") || "All";
+    (searchParams.get("status") as EventStatus) ?? "All";
 
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const [statusFilter, setStatusFilter] = useState<
-    | "All"
-    | "En cours"
-    | "Terminée"
-    | "Interruption programmée"
-    | "En préparation"
-  >(initialStatusFilter);
+  const [statusFilter, setStatusFilter] =
+    useState<EventStatus>(initialStatusFilter);
 
   const updateQueryParams = (search: string, status: string) => {
     const params = new URLSearchParams(searchParams);
@@ -125,17 +73,18 @@ export default function Home() {
       }
       acc[date].push(event);
       return acc;
-    }, {} as { [key: string]: EventUnit[] });
+    }, {} as { [key: string]: Event[] });
   }, [sports]);
 
   const filteredEventsByDate = useMemo(() => {
-    const filtered = {} as { [key: string]: EventUnit[] };
+    const filtered = {} as { [key: string]: Event[] };
     for (const date in eventsByDate) {
       const events = eventsByDate[date].filter((event) => {
         const regex = new RegExp(searchTerm, "i");
         const matchesSearch = regex.test(event.disciplineName);
         const matchesStatus =
-          statusFilter === "All" || event.statusDescription === statusFilter;
+          statusFilter === EventStatus.All ||
+          event.statusDescription === statusFilter;
         return matchesSearch && matchesStatus;
       });
       if (events.length > 0) {
@@ -151,14 +100,7 @@ export default function Home() {
   };
 
   const handleStatusFilterChange = (e: string) => {
-    setStatusFilter(
-      e as
-        | "All"
-        | "En cours"
-        | "Terminée"
-        | "Interruption programmée"
-        | "En préparation"
-    );
+    setStatusFilter(e as EventStatus);
     updateQueryParams(searchTerm, e);
   };
 
@@ -274,103 +216,3 @@ export default function Home() {
     </main>
   );
 }
-
-interface EventCardProps {
-  event: EventUnit;
-  getIconUrl: (disciplineCode: string) => string | null;
-}
-
-const EventCard: React.FC<EventCardProps> = ({ event, getIconUrl }) => {
-  const [showCompetitors, setShowCompetitors] = useState(false);
-
-  const toggleCompetitors = () => {
-    setShowCompetitors(!showCompetitors);
-  };
-
-  const iconUrl = getIconUrl(event.disciplineCode);
-
-  const getStatusColor = () => {
-    switch (event.statusDescription) {
-      case "Terminée":
-        return "border-blue-500 shadow-blue-500";
-      case "En cours":
-        return "border-green-500 shadow-green-500";
-      case "Interruption programmée":
-        return "border-yellow-500 shadow-yellow-500";
-      case "En préparation":
-        return "border-yellow-500 shadow-yellow-500";
-      default:
-        return "border-gray-300";
-    }
-  };
-
-  function getFlagUrl(countryCode: string) {
-    if (!countryCode) return "";
-    return (
-      process.env.NEXT_PUBLIC_FLAG_API + countryCode.toLowerCase() + ".png"
-    );
-  }
-
-  return (
-    <div className={`border p-4 rounded shadow  ${getStatusColor()}`}>
-      <div className="flex items-center mb-4 justify-between">
-        <div className="flex">
-          {iconUrl && (
-            <img
-              src={iconUrl}
-              alt={event.disciplineName}
-              className="w-10 h-10 mr-4"
-            />
-          )}
-          <h2 className="text-xl font-semibold">{event.disciplineName}</h2>
-        </div>
-        {event.statusDescription === "Programmée" && <Clock />}
-        {event.statusDescription === "Terminée" && <Check />}
-        <Rings
-          visible={
-            event.statusDescription === "En cours" ||
-            event.statusDescription === "Interruption programmée" ||
-            event.statusDescription === "En préparation"
-          }
-          height="40"
-          width="40"
-          color="#ef4444"
-          ariaLabel="rings-loading"
-        />
-      </div>
-      <div className="h-28 text-base">
-        <strong>
-          {new Intl.DateTimeFormat("fr-FR", {
-            timeStyle: "short",
-          }).format(new Date(event.startDate))}
-        </strong>
-        <p>{event.eventUnitName}</p>
-        <p>Lieux : {event.venueDescription}</p>
-      </div>
-
-      <Accordion type="single" collapsible onValueChange={toggleCompetitors}>
-        <AccordionItem value="item-1">
-          <AccordionTrigger>
-            {showCompetitors
-              ? "Cacher les résultats"
-              : "Afficher les résultats"}
-          </AccordionTrigger>
-          <AccordionContent>
-            {event.competitors.map((competitor, index) => (
-              <div key={competitor?.code} className="mt-2 flex">
-                <p className="flex">
-                  <img
-                    src={getFlagUrl(competitor?.noc)}
-                    alt={competitor?.noc}
-                    className="h-5 mr-2"
-                  />
-                  {index + 1} - {competitor?.name} : {competitor?.results?.mark}
-                </p>
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
-  );
-};
