@@ -18,10 +18,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { TailSpin } from "react-loader-spinner";
-import { Input } from "@/components/ui/input";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Event, EventStatus } from "@/interfaces/Event";
 import { EventCard } from "@/components/ui/event-card";
+import { SearchBar } from "@/components/ui/search-bar";
 
 interface SportsResponse {
   units: Event[];
@@ -36,11 +36,30 @@ export default function Home() {
     refreshInterval: 5000,
   });
 
+  const { data: disciplinesData } = useSWR<any>(
+    process.env.NEXT_PUBLIC_DISCIPLINES_API,
+    fetcher
+  );
+
   const getIconUrl = (disciplineCode: string) => {
     return (
       process.env.NEXT_PUBLIC_ICONS_API + disciplineCode.toLowerCase() + ".svg"
     );
   };
+
+  const [disciplines, setDisciplines] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  useEffect(() => {
+    if (!disciplinesData) return;
+    setDisciplines(
+      disciplinesData.modules[0].content.map((discipline: any) => ({
+        value: discipline.name,
+        label: discipline.name,
+      }))
+    );
+  }, [disciplinesData]);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -94,9 +113,9 @@ export default function Home() {
     return filtered;
   }, [eventsByDate, searchTerm, statusFilter]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    updateQueryParams(e.target.value, statusFilter);
+  const handleSearchChange = (string: string) => {
+    setSearchTerm(string);
+    updateQueryParams(string, statusFilter);
   };
 
   const handleStatusFilterChange = (e: string) => {
@@ -125,7 +144,10 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    if (initialSearchTerm !== "" || initialStatusFilter !== "All") return;
+    if (searchTerm !== "" || statusFilter !== "All") {
+      setCollapsedDays([]);
+      return;
+    }
     Object.keys(eventsByDate).forEach((date) => {
       const { 0: day, 1: month, 2: year } = date.split("/");
       const dayDate = new Date(`${year}-${month}-${day}`);
@@ -134,7 +156,7 @@ export default function Home() {
         setCollapsedDays((prev) => [...prev, date]);
       }
     });
-  }, [isLoadingSports]);
+  }, [isLoadingSports, searchTerm, statusFilter]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between lg:px-24 lg:py-8 px-8 py-2">
@@ -154,12 +176,10 @@ export default function Home() {
           />
         </div>
         <div className="mb-4 flex gap-4">
-          <Input
-            type="text"
-            placeholder="Rechercher..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="border p-2 rounded"
+          <SearchBar
+            initialSearch={initialSearchTerm}
+            disciplines={disciplines}
+            handleSearchChange={handleSearchChange}
           />
           <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
             <SelectTrigger className="w-[180px]">

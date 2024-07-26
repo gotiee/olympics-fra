@@ -5,7 +5,7 @@ services:
     labels:
        - "traefik.enable=true"
        - "traefik.http.routers.olympics.entrypoints=websecure"
-       - "traefik.http.routers.olympics.rule=Host(`jo.solignac.ovh`)
+       - "traefik.http.routers.olympics.rule=Host(`jo.solignac.ovh`)"
        - "traefik.http.services.olympics.loadbalancer.server.port=3000"
     networks:
       - traefik
