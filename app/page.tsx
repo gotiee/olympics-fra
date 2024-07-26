@@ -27,6 +27,10 @@ interface SportsResponse {
   units: Event[];
 }
 
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
 export default function Home() {
   const {
     data: sports,
@@ -99,7 +103,7 @@ export default function Home() {
     const filtered = {} as { [key: string]: Event[] };
     for (const date in eventsByDate) {
       const events = eventsByDate[date].filter((event) => {
-        const regex = new RegExp(searchTerm, "i");
+        const regex = new RegExp(escapeRegExp(searchTerm), "i");
         const matchesSearch = regex.test(event.disciplineName);
         const matchesStatus =
           statusFilter === EventStatus.All ||
@@ -158,6 +162,19 @@ export default function Home() {
     });
   }, [isLoadingSports, searchTerm, statusFilter]);
 
+  const [isFixed, setIsFixed] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsFixed(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between lg:px-24 lg:py-8 px-8 py-2">
       <div className="container mx-auto p-4">
@@ -175,7 +192,13 @@ export default function Home() {
             wrapperClass=""
           />
         </div>
-        <div className="mb-4 flex gap-4">
+        <div
+          className={`mb-4 flex gap-4 transition-all ${
+            isFixed
+              ? "fixed top-0 left-0 w-full bg-white shadow-md z-50 p-4"
+              : ""
+          }`}
+        >
           <SearchBar
             initialSearch={initialSearchTerm}
             disciplines={disciplines}

@@ -8,6 +8,10 @@ import {
 import { Input } from "./input";
 import { useMeasure } from "react-use";
 
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
 export function SearchBar({
   initialSearch,
   disciplines,
@@ -27,9 +31,11 @@ export function SearchBar({
       handleSearchChange(value);
       if (value === "") return setFilteredDisciplines(disciplines);
       setFilteredDisciplines(
-        disciplines.filter((discipline) =>
-          discipline.label.toLowerCase().includes(value.toLowerCase())
-        )
+        disciplines.filter((discipline) => {
+          const regex = new RegExp(escapeRegExp(value), "i");
+          const matchesSearch = regex.test(discipline.label.toLowerCase());
+          return matchesSearch;
+        })
       );
     }, 300);
     return () => {
