@@ -6,8 +6,8 @@ export interface Event {
   eventUnitName: string;
   startDate: string;
   venueDescription: string;
-  status: EventStatusV2;
-  statusDescription: EventStatus;
+  status: EventStatus;
+  statusDescription: string;
   disciplineCode: string;
   competitors: Competitor[];
 }
@@ -17,15 +17,6 @@ export interface EventsResponse {
 }
 
 export enum EventStatus {
-  All = "All",
-  InProgress = "En cours",
-  Finished = "Terminée",
-  Interupted = "Interruption programmée",
-  Scheduled = "Programmée",
-  Preparing = "En préparation",
-}
-
-export enum EventStatusV2 {
   All = "ALL",
   Cancelled = "CANCELLED",
   Finished = "FINISHED",

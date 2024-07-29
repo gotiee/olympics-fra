@@ -48,14 +48,12 @@ const EventCard: React.FC<EventCardProps> = React.memo(
     const iconUrl = getIconUrl(event.disciplineCode);
 
     const getStatusColor = () => {
-      switch (event.statusDescription) {
-        case "Terminée":
+      switch (event.status) {
+        case EventStatus.Finished:
           return "border-blue-500 shadow-blue-500";
-        case "En cours":
+        case EventStatus.Running:
           return "border-green-500 shadow-green-500";
-        case "Interruption programmée":
-          return "border-yellow-500 shadow-yellow-500";
-        case "En préparation":
+        case EventStatus.Interupted || EventStatus.Interupted:
           return "border-yellow-500 shadow-yellow-500";
         default:
           return "border-gray-300";
@@ -113,8 +111,8 @@ const EventCard: React.FC<EventCardProps> = React.memo(
             )}
             <h2 className="text-xl font-semibold">{event.disciplineName}</h2>
           </div>
-          {event.statusDescription === EventStatus.Scheduled && <Clock />}
-          {event.statusDescription === EventStatus.Finished &&
+          {event.status === EventStatus.Scheduled && <Clock />}
+          {event.status === EventStatus.Finished &&
             (medal ? (
               medal
             ) : didCountryWinEvent(event, "FRA") ? (
@@ -124,10 +122,10 @@ const EventCard: React.FC<EventCardProps> = React.memo(
             ))}
           <Rings
             visible={[
-              EventStatus.InProgress,
+              EventStatus.GettingReady,
               EventStatus.Interupted,
-              EventStatus.Preparing,
-            ].includes(event.statusDescription)}
+              EventStatus.Running,
+            ].includes(event.status)}
             height="40"
             width="40"
             color="#ef4444"

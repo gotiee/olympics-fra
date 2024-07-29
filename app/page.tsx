@@ -9,6 +9,7 @@ import { EventList } from "@/components/EventList";
 import { TailSpin } from "react-loader-spinner";
 import MedalsTable from "@/components/MedalsTable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { EventStatus } from "@/interfaces/Event";
 
 export default function Home() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Home() {
   const pathname = usePathname();
 
   const initialSearchTerm = searchParams.get("search") ?? "";
-  const initialStatusFilter = searchParams.get("status") ?? "All";
+  const initialStatusFilter = searchParams.get("status") ?? EventStatus.All;
   const initialTab = searchParams.get("tab") ?? "events";
 
   const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
@@ -26,7 +27,7 @@ export default function Home() {
   const [isFixed, setIsFixed] = useState<boolean>(false);
 
   const { filteredEventsByDate, isLoadingSports, isValidatingSports } =
-    useEvents(searchTerm, statusFilter);
+    useEvents(searchTerm, statusFilter, "FRA");
   const disciplines = useDisciplines(searchTerm);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    if (searchTerm !== "" || statusFilter !== "All") {
+    if (searchTerm !== "" || statusFilter !== EventStatus.All) {
       setCollapsedDays([]);
       return;
     }

@@ -1,10 +1,15 @@
 import useSWR from "swr";
 import { useMemo } from "react";
 import { fetcher } from "@/utils/fetcher";
-import { Event, EventsResponse } from "@/interfaces/Event";
+import { Event, EventsResponse, EventStatus } from "@/interfaces/Event";
 import { escapeRegExp } from "@/utils/utils";
+import { Competitor } from "@/interfaces/Competitor";
 
-export function useEvents(searchTerm: string, statusFilter: string) {
+export function useEvents(
+  searchTerm: string,
+  statusFilter: string,
+  countryCode: string
+) {
   const {
     data: sports,
     error,
@@ -15,6 +20,24 @@ export function useEvents(searchTerm: string, statusFilter: string) {
 
   const isLoadingSports = !sports && !error;
   const isValidatingSports = isValidating;
+
+  const didCountryWinEventMedal = (
+    event: Event,
+    countryCode: string
+  ): Competitor | undefined => {
+    return event.competitors.find(
+      (competitor) =>
+        competitor.noc === countryCode && competitor?.results?.medalType !== ""
+    );
+  };
+
+  const didCountryWinEvent = (event: Event, countryCode: string): boolean => {
+    return event.competitors.some(
+      (competitor) =>
+        competitor.noc === countryCode &&
+        competitor?.results?.winnerLoserTie === "W"
+    );
+  };
 
   const eventsByDate = useMemo(() => {
     if (!sports) return {};
@@ -32,19 +55,28 @@ export function useEvents(searchTerm: string, statusFilter: string) {
     const filtered: { [key: string]: Event[] } = {};
     for (const date in eventsByDate) {
       const events = eventsByDate[date].filter((event) => {
-        console.log(event.status)
         const regex = new RegExp(escapeRegExp(searchTerm), "i");
         const matchesSearch = regex.test(event.disciplineName);
         const matchesStatus =
-          statusFilter === "All" || event.statusDescription === statusFilter;
-        return matchesSearch && matchesStatus;
+          (statusFilter === EventStatus.All || event.status === statusFilter) &&
+          event.status !== EventStatus.Cancelled &&
+          event.status !== EventStatus.Delayed &&
+          event.status !== EventStatus.Rescheduled;
+        const matchesMedal =
+          statusFilter === "MEDAL" &&
+          didCountryWinEventMedal(event, countryCode);
+        const matchesVictory =
+          statusFilter === "VICTORY" && didCountryWinEvent(event, countryCode);
+        return (
+          matchesSearch && (matchesStatus || matchesMedal || matchesVictory)
+        );
       });
       if (events.length > 0) {
         filtered[date] = events;
       }
     }
     return filtered;
-  }, [eventsByDate, searchTerm, statusFilter]);
+  }, [eventsByDate, searchTerm, statusFilter, countryCode]);
 
   return { filteredEventsByDate, isLoadingSports, isValidatingSports };
 }

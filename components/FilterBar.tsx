@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SearchBar } from "@/components/ui/search-bar";
+import { EventStatus } from "@/interfaces/Event";
 
 interface FilterBarProps {
   readonly initialSearchTerm: string;
@@ -44,11 +45,12 @@ export function FilterBar({
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="All">Tous</SelectItem>
-            <SelectItem value="En cours">En cours</SelectItem>
-            <SelectItem value="Terminée">Terminée</SelectItem>
-            <SelectItem value="Programmée">Prévue</SelectItem>
-            <SelectItem value="Victoire">Victoire</SelectItem>
+            <SelectItem value={EventStatus.All}>Tous</SelectItem>
+            <SelectItem value={EventStatus.Running}>En cours</SelectItem>
+            <SelectItem value={EventStatus.Finished}>Terminée</SelectItem>
+            <SelectItem value={EventStatus.Scheduled}>Prévue</SelectItem>
+            <SelectItem value="VICTORY">Victoire</SelectItem>
+            <SelectItem value="MEDAL">Médaille</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
