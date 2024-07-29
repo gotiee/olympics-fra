@@ -4,7 +4,7 @@ import Confetti from "react-confetti";
 import { useMeasure } from "react-use";
 import { Event, EventStatus } from "@/interfaces/Event";
 import { Competitor } from "@/interfaces/Competitor";
-import { Check, Clock, Medal, PartyPopper } from "lucide-react";
+import { Check, Clock, MapPin, Medal, PartyPopper } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -53,7 +53,8 @@ const EventCard: React.FC<EventCardProps> = React.memo(
           return "border-blue-500 shadow-blue-500";
         case EventStatus.Running:
           return "border-green-500 shadow-green-500";
-        case EventStatus.Interupted || EventStatus.Interupted:
+        case EventStatus.Interupted:
+        case EventStatus.GettingReady:
           return "border-yellow-500 shadow-yellow-500";
         default:
           return "border-gray-300";
@@ -96,7 +97,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
               id={"confetti " + event.id}
               width={width + 32}
               height={height + 32}
-              numberOfPieces={10}
+              numberOfPieces={8}
             />
           </div>
         )}
@@ -133,14 +134,20 @@ const EventCard: React.FC<EventCardProps> = React.memo(
           />
         </div>
         <div className="h-28 text-base">
-          <strong>
-            {new Intl.DateTimeFormat("fr-FR", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            }).format(new Date(event.startDate))}
-          </strong>
-          <p>{event.eventUnitName}</p>
-          <p>Lieux : {event.venueDescription}</p>
+          <div className="mb-2">
+            <strong>
+              {new Intl.DateTimeFormat("fr-FR", {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(event.startDate))}
+            </strong>
+          </div>
+          <div className="mb-2">
+            <p>{event.eventUnitName}</p>
+          </div>
+          <p className="flex text-sm items-center">
+            <MapPin className="mr-1 size-3" /> {event.venueDescription}
+          </p>
         </div>
 
         <Accordion type="single" collapsible onValueChange={toggleCompetitors}>
@@ -171,5 +178,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
     );
   }
 );
+
+EventCard.displayName = "EventCard";
 
 export { EventCard };

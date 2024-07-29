@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEvents } from "@/hooks/useEvents";
 import { useDisciplines } from "@/hooks/useDisciplines";
@@ -10,6 +10,7 @@ import { TailSpin } from "react-loader-spinner";
 import MedalsTable from "@/components/MedalsTable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { EventStatus } from "@/interfaces/Event";
+import LoadingBar from "react-top-loading-bar";
 
 export default function Home() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function Home() {
   const { filteredEventsByDate, isLoadingSports, isValidatingSports } =
     useEvents(searchTerm, statusFilter, "FRA");
   const disciplines = useDisciplines(searchTerm);
-
+  const ref = useRef<any>(null);
   useEffect(() => {
     const handleScroll = () => {
       setIsFixed(window.scrollY > 90);
@@ -50,7 +51,15 @@ export default function Home() {
 
   useEffect(() => {
     const now = new Date();
-    if (searchTerm !== "" || statusFilter !== EventStatus.All) {
+    if (
+      searchTerm !== "" ||
+      ![
+        EventStatus.All,
+        EventStatus.Finished,
+        EventStatus.Scheduled,
+        "VICTORY",
+      ].includes(statusFilter as EventStatus)
+    ) {
       setCollapsedDays([]);
       return;
     }
@@ -69,6 +78,14 @@ export default function Home() {
     });
   }, [isLoadingSports, searchTerm, statusFilter]);
 
+  useEffect(() => {
+    if (isValidatingSports || isLoadingSports) {
+      ref?.current?.staticStart();
+    } else {
+      ref?.current?.complete();
+    }
+  }, [isValidatingSports, isLoadingSports, searchTerm, statusFilter]);
+
   const toggleDay = (date: string) => {
     setCollapsedDays((prev) =>
       prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date]
@@ -79,12 +96,13 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between lg:px-24 lg:py-8 px-8 py-2">
+      <LoadingBar color="#f11946" ref={ref} shadow={true} />
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">
           Équipe de France aux Jeux Olympiques 2024
         </h1>
 
-        <TailSpin
+        {/* <TailSpin
           visible={isValidatingSports}
           height="30"
           width="30"
@@ -92,7 +110,7 @@ export default function Home() {
           radius="5"
           wrapperStyle={{}}
           wrapperClass=""
-        />
+        /> */}
 
         <Tabs
           defaultValue={tab}

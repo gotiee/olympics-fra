@@ -56,4 +56,6 @@ const EventList: React.FC<EventListProps> = React.memo(
   )
 );
 
+EventList.displayName = "EventList";
+
 export { EventList };
