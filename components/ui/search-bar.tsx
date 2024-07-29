@@ -48,7 +48,7 @@ export function SearchBar({
       <PopoverTrigger asChild>
         <Input
           onMouseDown={() => setOpen(true)}
-          placeholder="Search framework..."
+          placeholder="Rechercher un sport..."
           type="text"
           ref={ref as LegacyRef<HTMLInputElement>}
           onChange={(e) => setValue(e.target.value)}

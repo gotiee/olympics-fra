@@ -1,4 +1,4 @@
-export const fetcher = async (url: string) => {
-  const res = await fetch(url);
-  return res.json();
-};
+export async function fetcher(url: string): Promise<any> {
+  const response = await fetch(url);
+  return response.json();
+}

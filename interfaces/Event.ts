@@ -12,6 +12,10 @@ export interface Event {
   competitors: Competitor[];
 }
 
+export interface EventsResponse {
+  units: Event[];
+}
+
 export enum EventStatus {
   All = "All",
   InProgress = "En cours",
@@ -22,9 +26,13 @@ export enum EventStatus {
 }
 
 export enum EventStatusV2 {
+  All = "ALL",
+  Cancelled = "CANCELLED",
   Finished = "FINISHED",
-  InProgress = "IN_PROGRESS",
+  Running = "RUNNING",
   Scheduled = "SCHEDULED",
-  Interupted = "INTERUPTED",
-  Preparing = "PREPARING",
+  Interupted = "SCHEDULED_BREAK",
+  GettingReady = "GETTING_READY",
+  Rescheduled = "RESCHEDULED",
+  Delayed = "DELAYED",
 }
