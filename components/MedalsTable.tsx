@@ -65,15 +65,13 @@ const MedalsTable: React.FC = () => {
               >
                 <td className="p-2 text-center">{entry.rank}</td>
                 <td className="p-2 flex items-center">
-                  <Image
-                    width={0}
-                    height={0}
-                    sizes="100vw"
-                    style={{ width: "100%", height: "auto" }}
-                    src={getFlagUrl(entry.noc)}
-                    alt={entry.description}
-                    className="w-8 mr-2"
-                  />
+                  <picture>
+                    <img
+                      src={getFlagUrl(entry.noc)}
+                      alt={entry.description}
+                      className="w-8 mr-2"
+                    />
+                  </picture>
                   <p className="hidden lg:inline">{entry.description}</p>
                 </td>
                 <td className="p-2 text-center">{entry.gold}</td>
