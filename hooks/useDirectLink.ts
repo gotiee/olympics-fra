@@ -20,7 +20,12 @@ const useDirectLink = (event: Event, franceTv?: FranceTv) => {
     ];
 
     const normalize = (str: string) =>
-      str.toLowerCase().replace(/[^a-z0-9]+/g, " ");
+      str
+        .toLowerCase()
+        .replace("-", "")
+        .replace("volleyball de plage", "beach volley")
+        .replace("ball", "")
+        .replace("slalom", "");
 
     const excludedWords = ["cyclisme ", "kayak"];
     const excludeWords = (str: string, words: string[]) =>

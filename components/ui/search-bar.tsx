@@ -28,7 +28,7 @@ export function SearchBar({
 
   useEffect(() => {
     const timeOutId = setTimeout(() => {
-      if (value === initialSearch) return;
+      if (value === initialSearch) return setFilteredDisciplines(disciplines);
       handleSearchChange(value);
       if (value === "") return setFilteredDisciplines(disciplines);
       setFilteredDisciplines(
