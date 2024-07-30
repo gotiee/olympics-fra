@@ -28,6 +28,7 @@ export function SearchBar({
 
   useEffect(() => {
     const timeOutId = setTimeout(() => {
+      if (value === initialSearch) return;
       handleSearchChange(value);
       if (value === "") return setFilteredDisciplines(disciplines);
       setFilteredDisciplines(
@@ -41,7 +42,7 @@ export function SearchBar({
     return () => {
       clearTimeout(timeOutId);
     };
-  }, [value, disciplines]);
+  }, [value, disciplines, handleSearchChange, initialSearch]);
 
   return (
     <Popover open={open}>

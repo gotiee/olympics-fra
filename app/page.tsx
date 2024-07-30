@@ -53,7 +53,6 @@ export default function Home() {
   useEffect(() => {
     const now = new Date();
     if (
-      searchTerm !== "" ||
       ![
         EventStatus.All,
         EventStatus.Finished,
@@ -77,7 +76,7 @@ export default function Home() {
         setCollapsedDays((prev) => [...prev, date]);
       }
     });
-  }, [isLoadingSports, searchTerm, statusFilter]);
+  }, [isLoadingSports, searchTerm, statusFilter, filteredEventsByDate]);
 
   useEffect(() => {
     if (isValidatingSports || isLoadingSports) {

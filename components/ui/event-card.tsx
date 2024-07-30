@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Rings } from "react-loader-spinner";
 import Confetti from "react-confetti";
 import { useMeasure } from "react-use";
@@ -19,8 +19,9 @@ import {
   AccordionTrigger,
 } from "./accordion";
 import { FranceTv } from "@/interfaces/FranceTv";
-import { cleanChannelName } from "@/utils/utils";
 import Link from "next/link";
+import useDirectLink from "@/hooks/useDirectLink";
+import Image from "next/image";
 
 interface EventCardProps {
   event: Event;
@@ -32,11 +33,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
   ({ event, getIconUrl, franceTv }) => {
     const [showCompetitors, setShowCompetitors] = useState(false);
     const [ref, { width, height }] = useMeasure();
-    const [direct, setDirect] = useState<{
-      link: string;
-      channel: string;
-      showAd: boolean;
-    } | null>(null);
+    const direct = useDirectLink(event, franceTv);
 
     const toggleCompetitors = () => setShowCompetitors((prev) => !prev);
 
@@ -59,49 +56,6 @@ const EventCard: React.FC<EventCardProps> = React.memo(
           competitor?.results?.medalType !== ""
       );
     };
-
-    useEffect(() => {
-      if (
-        franceTv?.france2 &&
-        franceTv.france2.additionalTitle.includes(event.disciplineName)
-      ) {
-        setDirect({
-          link:
-            process.env.NEXT_PUBLIC_FRANCE_TV_API +
-            "2" +
-            process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING,
-          channel: franceTv.france2.name,
-          showAd: franceTv.france2.showAd,
-        });
-      }
-      if (
-        franceTv?.france3 &&
-        franceTv.france3.additionalTitle.includes(event.disciplineName)
-      ) {
-        setDirect({
-          link:
-            process.env.NEXT_PUBLIC_FRANCE_TV_API +
-            "3" +
-            process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING,
-          channel: franceTv.france3.name,
-          showAd: franceTv.france3.showAd,
-        });
-      }
-
-      if (
-        franceTv?.parisH24 &&
-        franceTv.parisH24.additionalTitle.includes(event.disciplineName)
-      ) {
-        setDirect({
-          link:
-            process.env.NEXT_PUBLIC_FRANCE_TV_API +
-            "paris-h24" +
-            process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING,
-          channel: franceTv.parisH24.name,
-          showAd: franceTv.parisH24.showAd,
-        });
-      }
-    }, [franceTv]);
 
     const confettiRef = useRef<HTMLCanvasElement>(null);
 
@@ -127,13 +81,19 @@ const EventCard: React.FC<EventCardProps> = React.memo(
       for (const medal of medalTypes) {
         switch (medal) {
           case "ME_GOLD":
-            returnedValue.push(<Medal className="text-yellow-400 size-10" />);
+            returnedValue.push(
+              <Medal key={medal} className="text-yellow-400 size-10" />
+            );
             break;
           case "ME_SILVER":
-            returnedValue.push(<Medal className="text-gray-400 size-10" />);
+            returnedValue.push(
+              <Medal key={medal} className="text-gray-400 size-10" />
+            );
             break;
           case "ME_BRONZE":
-            returnedValue.push(<Medal className="text-amber-900 size-10" />);
+            returnedValue.push(
+              <Medal key={medal} className="text-amber-900 size-10" />
+            );
             break;
           default:
             break;
@@ -159,6 +119,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
       <div
         ref={ref as React.LegacyRef<HTMLDivElement>}
         className={`border p-4 rounded shadow relative ${getStatusColor()}`}
+        key={event.id}
       >
         {(didCountryWinEvent(event, "FRA") || medals.length > 0) && (
           <div className="absolute inset-0 w-full h-full pointer-events-none">
@@ -174,7 +135,9 @@ const EventCard: React.FC<EventCardProps> = React.memo(
         <div className="flex items-center mb-4 justify-between w-full items-center">
           <div className="flex items-center">
             {iconUrl && (
-              <img
+              <Image
+                width={0}
+                height={0}
                 src={iconUrl}
                 alt={event.disciplineName}
                 className="w-10 h-10 mr-4"
@@ -205,7 +168,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
             ariaLabel="rings-loading"
           />
         </div>
-        <div className="h-28 text-base mb-4">
+        <div className="min-h-24 text-base mb-2">
           <div className="mb-2">
             <strong>
               {new Intl.DateTimeFormat("fr-FR", {
@@ -221,10 +184,13 @@ const EventCard: React.FC<EventCardProps> = React.memo(
             <MapPin className="mr-1 size-3" /> {event.venueDescription}
           </p>
         </div>
-        <div className="flex text-lg items-center">
+        <div className="flex lg:text-lg text-base items-center mb-2">
           {direct &&
-            (event.status === EventStatus.Running ||
-              event.status === EventStatus.GettingReady) && (
+            [
+              EventStatus.Running,
+              EventStatus.Interupted,
+              EventStatus.GettingReady,
+            ].includes(event.status) && (
               <Link
                 href={direct.link}
                 target="_blank"
@@ -232,9 +198,18 @@ const EventCard: React.FC<EventCardProps> = React.memo(
                 className="flex items-center hover:text-gray-600"
               >
                 <MonitorPlay className="mr-2 hover:text-gray-600" />{" "}
-                <p className="hover:underline ">
-                  Regarder en direct sur {cleanChannelName(direct.channel)}
-                </p>
+                <p className="hover:underline">Regarder en direct sur</p>
+                <Image
+                  width={0}
+                  height={0}
+                  className="size-10 ml-2"
+                  src={
+                    direct.channel.includes("france")
+                      ? direct.logo.replace("-invert", "")
+                      : direct.logo
+                  }
+                  alt="logo-chaine"
+                />
               </Link>
             )}
         </div>
@@ -248,13 +223,15 @@ const EventCard: React.FC<EventCardProps> = React.memo(
             </AccordionTrigger>
             <AccordionContent>
               {event.competitors.map((competitor, index) => (
-                <div key={competitor?.code} className="mt-2 flex">
+                <div key={competitor?.name} className="mt-2 flex">
                   <p className="flex">
-                    <img
-                      src={getFlagUrl(competitor?.noc)}
-                      alt={competitor?.noc}
-                      className="h-5 mr-2"
-                    />
+                    <picture>
+                      <img
+                        src={getFlagUrl(competitor?.noc)}
+                        alt={competitor?.noc}
+                        className="h-5 mr-2"
+                      />
+                    </picture>
                     {index + 1} - {competitor?.name} :{" "}
                     {competitor?.results?.mark}
                   </p>

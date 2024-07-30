@@ -64,6 +64,14 @@ export function useEvents(
           event.status !== EventStatus.Cancelled &&
           event.status !== EventStatus.Delayed &&
           event.status !== EventStatus.Rescheduled;
+
+        const matchesRunningStatus =
+          statusFilter === EventStatus.Running &&
+          [
+            EventStatus.Interupted,
+            EventStatus.GettingReady,
+            EventStatus.Running,
+          ].includes(event.status);
         const didCountryWinEventMedalArray = didCountryWinEventMedal(
           event,
           countryCode
@@ -75,7 +83,11 @@ export function useEvents(
         const matchesVictory =
           statusFilter === "VICTORY" && didCountryWinEvent(event, countryCode);
         return (
-          matchesSearch && (matchesStatus || matchesMedal || matchesVictory)
+          matchesSearch &&
+          (matchesStatus ||
+            matchesMedal ||
+            matchesVictory ||
+            matchesRunningStatus)
         );
       });
       if (events.length > 0) {

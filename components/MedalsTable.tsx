@@ -5,6 +5,7 @@ import { useMedalsTable } from "@/hooks/useMedalsTable";
 import { Medal } from "lucide-react";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
+import Image from "next/image";
 
 const getFlagUrl = (countryCode: string) => {
   if (!countryCode) return "";
@@ -64,7 +65,11 @@ const MedalsTable: React.FC = () => {
               >
                 <td className="p-2 text-center">{entry.rank}</td>
                 <td className="p-2 flex items-center">
-                  <img
+                  <Image
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    style={{ width: "100%", height: "auto" }}
                     src={getFlagUrl(entry.noc)}
                     alt={entry.description}
                     className="w-8 mr-2"
