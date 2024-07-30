@@ -6,11 +6,11 @@ import { useEvents } from "@/hooks/useEvents";
 import { useDisciplines } from "@/hooks/useDisciplines";
 import { FilterBar } from "@/components/FilterBar";
 import { EventList } from "@/components/EventList";
-import { TailSpin } from "react-loader-spinner";
 import MedalsTable from "@/components/MedalsTable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { EventStatus } from "@/interfaces/Event";
 import LoadingBar from "react-top-loading-bar";
+import { useFranceTv } from "@/hooks/useFranceTv";
 
 export default function Home() {
   const router = useRouter();
@@ -30,6 +30,7 @@ export default function Home() {
   const { filteredEventsByDate, isLoadingSports, isValidatingSports } =
     useEvents(searchTerm, statusFilter, "FRA");
   const disciplines = useDisciplines(searchTerm);
+  const { franceTv } = useFranceTv();
   const ref = useRef<any>(null);
   useEffect(() => {
     const handleScroll = () => {
@@ -101,17 +102,6 @@ export default function Home() {
         <h1 className="text-2xl font-bold mb-4">
           Équipe de France aux Jeux Olympiques 2024
         </h1>
-
-        {/* <TailSpin
-          visible={isValidatingSports}
-          height="30"
-          width="30"
-          color="#3b82f6"
-          radius="5"
-          wrapperStyle={{}}
-          wrapperClass=""
-        /> */}
-
         <Tabs
           defaultValue={tab}
           className={`w-full`}
@@ -151,6 +141,7 @@ export default function Home() {
                 <h1>Aucun événements</h1>
               )}
             <EventList
+              franceTv={franceTv}
               filteredEventsByDate={filteredEventsByDate}
               toggleDay={toggleDay}
               isDayCollapsed={isDayCollapsed}

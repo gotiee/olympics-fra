@@ -1,26 +1,42 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Rings } from "react-loader-spinner";
 import Confetti from "react-confetti";
 import { useMeasure } from "react-use";
 import { Event, EventStatus } from "@/interfaces/Event";
 import { Competitor } from "@/interfaces/Competitor";
-import { Check, Clock, MapPin, Medal, PartyPopper } from "lucide-react";
+import {
+  Check,
+  Clock,
+  MapPin,
+  Medal,
+  MonitorPlay,
+  PartyPopper,
+} from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "./accordion";
+import { FranceTv } from "@/interfaces/FranceTv";
+import { cleanChannelName } from "@/utils/utils";
+import Link from "next/link";
 
 interface EventCardProps {
   event: Event;
   getIconUrl: (disciplineCode: string) => string | null;
+  franceTv: FranceTv | undefined;
 }
 
 const EventCard: React.FC<EventCardProps> = React.memo(
-  ({ event, getIconUrl }) => {
+  ({ event, getIconUrl, franceTv }) => {
     const [showCompetitors, setShowCompetitors] = useState(false);
     const [ref, { width, height }] = useMeasure();
+    const [direct, setDirect] = useState<{
+      link: string;
+      channel: string;
+      showAd: boolean;
+    } | null>(null);
 
     const toggleCompetitors = () => setShowCompetitors((prev) => !prev);
 
@@ -35,13 +51,57 @@ const EventCard: React.FC<EventCardProps> = React.memo(
     const didCountryWinEventMedal = (
       event: Event,
       countryCode: string
-    ): Competitor | undefined => {
-      return event.competitors.find(
+    ): Competitor[] | undefined => {
+      return event.competitors.filter(
         (competitor) =>
           competitor.noc === countryCode &&
+          competitor?.results &&
           competitor?.results?.medalType !== ""
       );
     };
+
+    useEffect(() => {
+      if (
+        franceTv?.france2 &&
+        franceTv.france2.additionalTitle.includes(event.disciplineName)
+      ) {
+        setDirect({
+          link:
+            process.env.NEXT_PUBLIC_FRANCE_TV_API +
+            "2" +
+            process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING,
+          channel: franceTv.france2.name,
+          showAd: franceTv.france2.showAd,
+        });
+      }
+      if (
+        franceTv?.france3 &&
+        franceTv.france3.additionalTitle.includes(event.disciplineName)
+      ) {
+        setDirect({
+          link:
+            process.env.NEXT_PUBLIC_FRANCE_TV_API +
+            "3" +
+            process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING,
+          channel: franceTv.france3.name,
+          showAd: franceTv.france3.showAd,
+        });
+      }
+
+      if (
+        franceTv?.parisH24 &&
+        franceTv.parisH24.additionalTitle.includes(event.disciplineName)
+      ) {
+        setDirect({
+          link:
+            process.env.NEXT_PUBLIC_FRANCE_TV_API +
+            "paris-h24" +
+            process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING,
+          channel: franceTv.parisH24.name,
+          showAd: franceTv.parisH24.showAd,
+        });
+      }
+    }, [franceTv]);
 
     const confettiRef = useRef<HTMLCanvasElement>(null);
 
@@ -61,17 +121,25 @@ const EventCard: React.FC<EventCardProps> = React.memo(
       }
     };
 
-    const getMedalColor = (medalType: string | undefined) => {
-      switch (medalType) {
-        case "ME_GOLD":
-          return <Medal className="text-yellow-400 size-10" />;
-        case "ME_SILVER":
-          return <Medal className="text-gray-400 size-10" />;
-        case "ME_BRONZE":
-          return <Medal className="text-amber-900 size-10" />;
-        default:
-          return "";
+    const getMedalColor = (medalTypes: string[] | undefined) => {
+      if (!medalTypes) return "";
+      let returnedValue: any[] = [];
+      for (const medal of medalTypes) {
+        switch (medal) {
+          case "ME_GOLD":
+            returnedValue.push(<Medal className="text-yellow-400 size-10" />);
+            break;
+          case "ME_SILVER":
+            returnedValue.push(<Medal className="text-gray-400 size-10" />);
+            break;
+          case "ME_BRONZE":
+            returnedValue.push(<Medal className="text-amber-900 size-10" />);
+            break;
+          default:
+            break;
+        }
       }
+      return returnedValue;
     };
 
     const getFlagUrl = (countryCode: string) => {
@@ -81,8 +149,10 @@ const EventCard: React.FC<EventCardProps> = React.memo(
       );
     };
 
-    const medal = getMedalColor(
-      didCountryWinEventMedal(event, "FRA")?.results?.medalType
+    const medals = getMedalColor(
+      didCountryWinEventMedal(event, "FRA")?.map(
+        (e: Competitor) => e.results?.medalType
+      )
     );
 
     return (
@@ -90,7 +160,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
         ref={ref as React.LegacyRef<HTMLDivElement>}
         className={`border p-4 rounded shadow relative ${getStatusColor()}`}
       >
-        {(didCountryWinEvent(event, "FRA") || medal) && (
+        {(didCountryWinEvent(event, "FRA") || medals.length > 0) && (
           <div className="absolute inset-0 w-full h-full pointer-events-none">
             <Confetti
               ref={confettiRef}
@@ -114,8 +184,10 @@ const EventCard: React.FC<EventCardProps> = React.memo(
           </div>
           {event.status === EventStatus.Scheduled && <Clock />}
           {event.status === EventStatus.Finished &&
-            (medal ? (
-              medal
+            (medals ? (
+              <div className="flex justify-end">
+                {medals.map((medal) => medal)}
+              </div>
             ) : didCountryWinEvent(event, "FRA") ? (
               <PartyPopper />
             ) : (
@@ -133,7 +205,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
             ariaLabel="rings-loading"
           />
         </div>
-        <div className="h-28 text-base">
+        <div className="h-28 text-base mb-4">
           <div className="mb-2">
             <strong>
               {new Intl.DateTimeFormat("fr-FR", {
@@ -148,6 +220,23 @@ const EventCard: React.FC<EventCardProps> = React.memo(
           <p className="flex text-sm items-center">
             <MapPin className="mr-1 size-3" /> {event.venueDescription}
           </p>
+        </div>
+        <div className="flex text-lg items-center">
+          {direct &&
+            (event.status === EventStatus.Running ||
+              event.status === EventStatus.GettingReady) && (
+              <Link
+                href={direct.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center hover:text-gray-600"
+              >
+                <MonitorPlay className="mr-2 hover:text-gray-600" />{" "}
+                <p className="hover:underline ">
+                  Regarder en direct sur {cleanChannelName(direct.channel)}
+                </p>
+              </Link>
+            )}
         </div>
 
         <Accordion type="single" collapsible onValueChange={toggleCompetitors}>

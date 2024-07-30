@@ -24,10 +24,12 @@ export function useEvents(
   const didCountryWinEventMedal = (
     event: Event,
     countryCode: string
-  ): Competitor | undefined => {
-    return event.competitors.find(
+  ): Competitor[] | undefined => {
+    return event.competitors.filter(
       (competitor) =>
-        competitor.noc === countryCode && competitor?.results?.medalType !== ""
+        competitor.noc === countryCode &&
+        competitor?.results &&
+        competitor?.results?.medalType !== ""
     );
   };
 
@@ -62,9 +64,14 @@ export function useEvents(
           event.status !== EventStatus.Cancelled &&
           event.status !== EventStatus.Delayed &&
           event.status !== EventStatus.Rescheduled;
+        const didCountryWinEventMedalArray = didCountryWinEventMedal(
+          event,
+          countryCode
+        );
         const matchesMedal =
           statusFilter === "MEDAL" &&
-          didCountryWinEventMedal(event, countryCode);
+          didCountryWinEventMedalArray &&
+          didCountryWinEventMedalArray.length > 0;
         const matchesVictory =
           statusFilter === "VICTORY" && didCountryWinEvent(event, countryCode);
         return (
