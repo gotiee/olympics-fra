@@ -22,6 +22,7 @@ import { FranceTv } from "@/interfaces/FranceTv";
 import Link from "next/link";
 import useDirectLink from "@/hooks/useDirectLink";
 import Image from "next/image";
+import { AnyCnameRecord } from "dns";
 
 interface EventCardProps {
   event: Event;
@@ -75,8 +76,8 @@ const EventCard: React.FC<EventCardProps> = React.memo(
       }
     };
 
-    const getMedalColor = (medalTypes: string[] | undefined) => {
-      if (!medalTypes) return "";
+    const getMedalColor = (medalTypes: string[] | undefined): any[] => {
+      if (!medalTypes) return [];
       let returnedValue: any[] = [];
       for (const medal of medalTypes) {
         switch (medal) {
@@ -96,6 +97,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
             );
             break;
           default:
+            return returnedValue;
             break;
         }
       }
@@ -147,9 +149,9 @@ const EventCard: React.FC<EventCardProps> = React.memo(
           </div>
           {event.status === EventStatus.Scheduled && <Clock />}
           {event.status === EventStatus.Finished &&
-            (medals ? (
+            (medals.length > 0 ? (
               <div className="flex justify-end">
-                {medals.map((medal) => medal)}
+                {medals.map((medal: any) => medal)}
               </div>
             ) : didCountryWinEvent(event, "FRA") ? (
               <PartyPopper />

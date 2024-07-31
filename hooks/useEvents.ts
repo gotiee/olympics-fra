@@ -25,7 +25,7 @@ export function useEvents(
     event: Event,
     countryCode: string
   ): Competitor[] | undefined => {
-    return event.competitors.filter(
+    return event?.competitors?.filter(
       (competitor) =>
         competitor.noc === countryCode &&
         competitor?.results &&
@@ -62,8 +62,7 @@ export function useEvents(
         const matchesStatus =
           (statusFilter === EventStatus.All || event.status === statusFilter) &&
           event.status !== EventStatus.Cancelled &&
-          event.status !== EventStatus.Delayed &&
-          event.status !== EventStatus.Rescheduled;
+          event.status !== EventStatus.Delayed;
 
         const matchesRunningStatus =
           statusFilter === EventStatus.Running &&
@@ -81,7 +80,9 @@ export function useEvents(
           didCountryWinEventMedalArray &&
           didCountryWinEventMedalArray.length > 0;
         const matchesVictory =
-          statusFilter === "VICTORY" && didCountryWinEvent(event, countryCode);
+          statusFilter === "VICTORY" &&
+          (didCountryWinEvent(event, countryCode) ||
+            didCountryWinEventMedalArray!.length > 0);
         return (
           matchesSearch &&
           (matchesStatus ||

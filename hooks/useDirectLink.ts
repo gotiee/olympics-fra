@@ -22,7 +22,7 @@ const useDirectLink = (event: Event, franceTv?: FranceTv) => {
     const normalize = (str: string) =>
       str
         .toLowerCase()
-        .replace("-", "")
+        .replace("-", " ")
         .replace("volleyball de plage", "beach volley")
         .replace("ball", "")
         .replace("slalom", "");

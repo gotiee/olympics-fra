@@ -26,6 +26,7 @@ export default function Home() {
   const [tab, setTab] = useState<string>(initialTab);
   const [collapsedDays, setCollapsedDays] = useState<string[]>([]);
   const [isFixed, setIsFixed] = useState<boolean>(false);
+  const [seen, setSeen] = useState<boolean>(false);
 
   const { filteredEventsByDate, isLoadingSports, isValidatingSports } =
     useEvents(searchTerm, statusFilter, "FRA");
@@ -48,6 +49,7 @@ export default function Home() {
     params.set("status", status);
     params.set("tab", tab);
     router.push(`${pathname}?${params.toString()}`);
+    setSeen(false);
   };
 
   useEffect(() => {
@@ -63,6 +65,9 @@ export default function Home() {
       setCollapsedDays([]);
       return;
     }
+
+    if (seen || isLoadingSports) return;
+
     Object.keys(filteredEventsByDate).forEach((date) => {
       const [day, month, year] = date.split("/");
       const dayDate = new Date(`${year}-${month}-${day}`);
@@ -76,7 +81,15 @@ export default function Home() {
         setCollapsedDays((prev) => [...prev, date]);
       }
     });
-  }, [isLoadingSports, searchTerm, statusFilter, filteredEventsByDate]);
+    setSeen(true);
+  }, [
+    isLoadingSports,
+    searchTerm,
+    statusFilter,
+    filteredEventsByDate,
+    setSeen,
+    seen,
+  ]);
 
   useEffect(() => {
     if (isValidatingSports || isLoadingSports) {
