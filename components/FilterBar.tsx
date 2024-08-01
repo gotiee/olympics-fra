@@ -30,7 +30,7 @@ export function FilterBar({
 }: FilterBarProps) {
   return (
     <div
-      className={`mb-4 flex gap-4 transition-all ${
+      className={`lg:mb-4 mb-2 flex gap-4 transition-all ${
         isFixed ? "fixed top-0 left-0 w-full bg-white shadow-md z-50 p-4" : ""
       }`}
     >

@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { EventCard } from "@/components/ui/event-card";
+import { EventCard } from "@/components/EventCard";
 import { Event } from "@/interfaces/Event";
 import { firstLetterToUpperCase, getDateFromString } from "@/utils/utils";
 import { FranceTv } from "@/interfaces/FranceTv";

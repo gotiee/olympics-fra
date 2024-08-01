@@ -108,12 +108,20 @@ export default function Home() {
   const isDayCollapsed = (date: string) => collapsedDays.includes(date);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between lg:px-24 lg:py-8 px-8 py-2">
+    <main className="flex min-h-screen flex-col items-center justify-between lg:px-24 lg:py-8 px-4 py-1">
       <LoadingBar color="#f11946" ref={ref} shadow={true} />
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">
-          Équipe de France aux Jeux Olympiques 2024
-        </h1>
+      <div className="container mx-auto  lg:p-4 p-2">
+        <div className="flex items-center justify-center w-full mb-4">
+          <picture>
+            <img className="lg:w-8 w-6 mr-4" src="/images/jo.png" alt="jo" />
+          </picture>
+          <h1 className="lg:text-2xl text-lg font-bold mb-4 text-center">
+            Équipe de France <br /> Jeux Olympiques 2024
+          </h1>
+          <picture>
+            <img className="lg:w-8 w-6 ml-4" src="/images/jop.png" alt="jop" />
+          </picture>
+        </div>
         <Tabs
           defaultValue={tab}
           className={`w-full`}
@@ -122,7 +130,7 @@ export default function Home() {
             updateQueryParams(searchTerm, statusFilter, tab);
           }}
         >
-          <TabsList className={`w-full mb-4 lg:h-12`}>
+          <TabsList className={`w-full lg:mb-4 mb-2 lg:h-12`}>
             <TabsTrigger value="events" className={`w-full lg:text-lg`}>
               Événements
             </TabsTrigger>

@@ -2,14 +2,18 @@ import useSWR from "swr";
 import { useMemo } from "react";
 import { fetcher } from "@/utils/fetcher";
 import { Event, EventsResponse, EventStatus } from "@/interfaces/Event";
-import { escapeRegExp } from "@/utils/utils";
-import { Competitor } from "@/interfaces/Competitor";
+import {
+  didCountryWinEvent,
+  didCountryWinEventMedal,
+  escapeRegExp,
+} from "@/utils/utils";
 
 export function useEvents(
   searchTerm: string,
   statusFilter: string,
   countryCode: string
 ) {
+  // Utiliser SWR pour récupérer les données
   const {
     data: sports,
     error,
@@ -21,26 +25,7 @@ export function useEvents(
   const isLoadingSports = !sports && !error;
   const isValidatingSports = isValidating;
 
-  const didCountryWinEventMedal = (
-    event: Event,
-    countryCode: string
-  ): Competitor[] | undefined => {
-    return event?.competitors?.filter(
-      (competitor) =>
-        competitor.noc === countryCode &&
-        competitor?.results &&
-        competitor?.results?.medalType !== ""
-    );
-  };
-
-  const didCountryWinEvent = (event: Event, countryCode: string): boolean => {
-    return event.competitors.some(
-      (competitor) =>
-        competitor.noc === countryCode &&
-        competitor?.results?.winnerLoserTie === "W"
-    );
-  };
-
+  // Grouper les événements par date
   const eventsByDate = useMemo(() => {
     if (!sports) return {};
     return sports.units.reduce((acc: { [key: string]: Event[] }, event) => {
@@ -53,6 +38,7 @@ export function useEvents(
     }, {});
   }, [sports]);
 
+  // Appliquer les filtres
   const filteredEventsByDate = useMemo(() => {
     const filtered: { [key: string]: Event[] } = {};
     for (const date in eventsByDate) {
@@ -77,18 +63,23 @@ export function useEvents(
           [EventStatus.Scheduled, EventStatus.Rescheduled].includes(
             event.status
           );
+
         const didCountryWinEventMedalArray = didCountryWinEventMedal(
           event,
           countryCode
         );
+
         const matchesMedal =
           statusFilter === "MEDAL" &&
           didCountryWinEventMedalArray &&
           didCountryWinEventMedalArray.length > 0;
+
         const matchesVictory =
           statusFilter === "VICTORY" &&
           (didCountryWinEvent(event, countryCode) ||
-            didCountryWinEventMedalArray!.length > 0);
+            (didCountryWinEventMedalArray &&
+              didCountryWinEventMedalArray.length > 0));
+
         return (
           matchesSearch &&
           (matchesStatus ||

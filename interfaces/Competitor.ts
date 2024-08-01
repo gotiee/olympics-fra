@@ -8,6 +8,7 @@ export interface Competitor {
     mark: string;
     winnerLoserTie: string;
     medalType: string;
+    detailedMark: Array<Array<number>>;
     irm: string;
   };
 }
