@@ -3,6 +3,7 @@ import { Event, EventStatus } from "@/interfaces/Event";
 import { MapPin, MonitorPlay } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "../ui/button";
 
 interface EventDetailsProps {
   event: Event;
@@ -10,7 +11,7 @@ interface EventDetailsProps {
 }
 
 const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
-  <div className="lg:min-h-24 min-h-16 text-base lg:mb-2 mb-1">
+  <div className="lg:min-h-24 min-h-8 text-base lg:mb-2 mb-1">
     <div className="lg:mb-2 mb-1 lg:text-lg text-sm">
       <p>{event.eventUnitName}</p>
     </div>
@@ -24,30 +25,32 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
           EventStatus.Interupted,
           EventStatus.GettingReady,
         ].includes(event.status) && (
-          <Link
-            href={direct.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center hover:text-gray-600"
-          >
-            <div className="lg:size-8 size-5 mr-2">
-              <MonitorPlay className="hover:text-gray-600 lg:size-8 size-6" />{" "}
-            </div>
-            <p className="lg:text-base text-sm hover:underline">
-              Regarder en direct sur
-            </p>
-            <Image
-              width={0}
-              height={0}
-              className="lg:size-12 size-8 ml-2"
-              src={
-                direct.channel.includes("france")
-                  ? direct.logo.replace("-invert", "")
-                  : direct.logo
-              }
-              alt="logo-chaine"
-            />
-          </Link>
+          <Button variant="outline" asChild className="p-2 h-8 mt-2">
+            <Link
+              href={direct.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center "
+            >
+              <div className="lg:size-8 size-5 mr-2">
+                <MonitorPlay className=" lg:size-8 size-6" />{" "}
+              </div>
+              <p className="lg:text-base text-sm hover:underline">
+                Regarder en direct sur
+              </p>
+              <Image
+                width={0}
+                height={0}
+                className="lg:size-12 size-8 ml-2"
+                src={
+                  direct.channel.includes("france")
+                    ? direct.logo.replace("-invert", "")
+                    : direct.logo
+                }
+                alt="logo-chaine"
+              />
+            </Link>
+          </Button>
         )}
     </div>
   </div>
