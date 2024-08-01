@@ -71,6 +71,12 @@ export function useEvents(
             EventStatus.GettingReady,
             EventStatus.Running,
           ].includes(event.status);
+
+        const matchesSchedule =
+          statusFilter === EventStatus.Scheduled &&
+          [EventStatus.Scheduled, EventStatus.Rescheduled].includes(
+            event.status
+          );
         const didCountryWinEventMedalArray = didCountryWinEventMedal(
           event,
           countryCode
@@ -88,7 +94,8 @@ export function useEvents(
           (matchesStatus ||
             matchesMedal ||
             matchesVictory ||
-            matchesRunningStatus)
+            matchesRunningStatus ||
+            matchesSchedule)
         );
       });
       if (events.length > 0) {
