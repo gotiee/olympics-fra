@@ -58,7 +58,9 @@ const EventCard: React.FC<EventCardProps> = React.memo(
     return (
       <div
         ref={ref as React.LegacyRef<HTMLDivElement>}
-        className={cn(`border p-4 rounded shadow relative ${statusColor}`)}
+        className={cn(
+          `border p-4 rounded shadow relative ${statusColor} ${event.disciplineCode}`
+        )}
         key={event.id}
       >
         {(didCountryWinEvent(event, "FRA") || medals.length > 0) && (

@@ -29,8 +29,14 @@ const EventHeader: React.FC<EventHeaderProps> = ({
             className="lg:size-10 size-8 lg:mr-4 mr-2"
           />
         )}
-        <h2 className="lg:text-xl text-lg font-semibold">
+        <h2 className="lg:text-xl text-base font-semibold">
           {event.disciplineName}
+          <p className="lg:text-base text-sm">
+            {new Intl.DateTimeFormat("fr-FR", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            }).format(new Date(event.startDate))}
+          </p>
         </h2>
       </div>
       {getIconCard(event, medals)}

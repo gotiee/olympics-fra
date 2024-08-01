@@ -11,21 +11,13 @@ interface EventDetailsProps {
 
 const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
   <div className="lg:min-h-24 min-h-16 text-base lg:mb-2 mb-1">
-    <div className="lg:mb-2 mb-1">
-      <strong>
-        {new Intl.DateTimeFormat("fr-FR", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(new Date(event.startDate))}
-      </strong>
-    </div>
-    <div className="lg:mb-2 mb-1">
+    <div className="lg:mb-2 mb-1 lg:text-lg text-sm">
       <p>{event.eventUnitName}</p>
     </div>
-    <p className="flex text-sm items-center">
+    <p className="flex lg:text-sm text-xs items-center">
       <MapPin className="mr-1 size-3" /> {event.venueDescription}
     </p>
-    <div className="flex lg:text-lg text-base items-center mb-2">
+    <div className="flex lg:text-lg text-sm items-center mb-2">
       {direct &&
         [
           EventStatus.Running,
@@ -38,7 +30,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
             rel="noopener noreferrer"
             className="flex items-center hover:text-gray-600"
           >
-            <div className="lg:size-8 size-6 mr-2">
+            <div className="lg:size-8 size-5 mr-2">
               <MonitorPlay className="hover:text-gray-600 lg:size-8 size-6" />{" "}
             </div>
             <p className="lg:text-base text-sm hover:underline">
