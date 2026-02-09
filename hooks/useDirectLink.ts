@@ -1,5 +1,5 @@
 import { Event } from "@/interfaces/Event";
-import { FranceTv } from "@/interfaces/FranceTv";
+import { FranceTv, FranceTvChannel } from "@/interfaces/FranceTv";
 import { useState, useEffect } from "react";
 
 const useDirectLink = (event: Event, franceTv?: FranceTv) => {
@@ -14,9 +14,8 @@ const useDirectLink = (event: Event, franceTv?: FranceTv) => {
     if (!franceTv || !event) return;
 
     const channels = [
-      { key: "france2", id: "france-2" },
-      { key: "france3", id: "france-3" },
-      { key: "parisH24", id: "paris-h24" },
+      { key: "france2", id: "france-2", logo: process.env.NEXT_PUBLIC_FRANCE_2_LOGO || "" },
+      { key: "france3", id: "france-3", logo: process.env.NEXT_PUBLIC_FRANCE_3_LOGO || "" },
     ];
 
     const normalize = (str: string) =>
@@ -38,24 +37,23 @@ const useDirectLink = (event: Event, franceTv?: FranceTv) => {
       excludeWords(event.disciplineName.toLowerCase(), excludedWords)
     );
 
+
     for (const channel of channels) {
       const tmp = franceTv as any;
-      const channelData = tmp[channel.key];
-      if (channelData) {
-        const normalizedAdditionalTitle = normalize(
-          channelData.additionalTitle
-        );
-
+      const channelData = tmp[channel.key] as FranceTvChannel;
+      channelData.collections.filter((collection) => 
+        collection.label === "En direct"
+      ).forEach((collection) => {
+        const normalizedAdditionalTitle = normalize(collection.items[0].title || "");
         if (normalizedAdditionalTitle.includes(eventTitle)) {
           setDirect({
             link: `${process.env.NEXT_PUBLIC_FRANCE_TV_API}${channel.id}${process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING}`,
-            channel: channelData.name,
-            showAd: channelData.showAd,
-            logo: channelData.logo,
+            channel: channel.id,
+            showAd: false,
+            logo: channel.logo,
           });
-          break;
         }
-      }
+      });
     }
   }, [event, franceTv]);
 

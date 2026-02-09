@@ -2,7 +2,7 @@ export interface Discipline {
   slug: string;
   isParalympic: boolean;
   code: string;
-  description: string;
+  name: string;
   isSport: boolean;
   order: string;
 }

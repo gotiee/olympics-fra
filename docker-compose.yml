@@ -1,7 +1,7 @@
 services:
   olympics:
     restart: always
-    image: 'registry.solignac.ovh/olympics/front:latest'
+    image: 'registry.raclette.ovh/olympics:latest'
     labels:
        - "traefik.enable=true"
        - "traefik.http.routers.olympics.entrypoints=websecure"

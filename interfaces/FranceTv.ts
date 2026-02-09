@@ -1,22 +1,20 @@
-export interface FranceTvChannel {
-  name: string;
-  logo: string;
-  id: string;
-  title: string;
-  additionalTitle: string;
-  preTitle: string;
-  beginDate: string;
-  endDate: string;
-  duration: number;
-  progress: number;
-  refresh: number;
-  layerType: string;
-  showAd: boolean;
-  chattable: boolean;
-}
-
 export interface FranceTv {
   france2: FranceTvChannel;
   france3: FranceTvChannel;
-  parisH24: FranceTvChannel;
+}
+
+export interface FranceTvChannel {
+  label: string
+  collections: Collection[]
+}
+
+export interface Collection {
+  id?: number
+  label: string
+  items: Item2[]
+}
+
+export interface Item2 {
+  id: number
+  title?: string
 }

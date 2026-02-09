@@ -116,7 +116,7 @@ export default function Home() {
             <img className="lg:w-8 w-6 mr-4" src="/images/jo.png" alt="jo" />
           </picture>
           <h1 className="lg:text-2xl text-lg font-bold mb-4 text-center">
-            Équipe de France <br /> Jeux Olympiques 2024
+            Équipe de France <br /> Jeux Olympiques 2026
           </h1>
           <picture>
             <img className="lg:w-8 w-6 ml-4" src="/images/jop.png" alt="jop" />

@@ -27,7 +27,6 @@ const EventCard: React.FC<EventCardProps> = React.memo(
     const [showCompetitors, setShowCompetitors] = useState(false);
     const [ref, { width, height }] = useMeasure();
     const direct = useDirectLink(event, franceTv);
-
     const toggleCompetitors = () => setShowCompetitors((prev) => !prev);
 
     const confettiRef = useRef<HTMLCanvasElement>(null);
@@ -39,7 +38,6 @@ const EventCard: React.FC<EventCardProps> = React.memo(
     );
 
     const getStatusColor = (eventStatus: EventStatus): string => {
-      console.log(eventStatus);
       switch (eventStatus) {
         case EventStatus.Finished:
           return "border-blue-500 shadow-blue-500";

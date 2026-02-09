@@ -13,7 +13,6 @@ export function useEvents(
   statusFilter: string,
   countryCode: string
 ) {
-  // Utiliser SWR pour récupérer les données
   const {
     data: sports,
     error,
@@ -25,11 +24,10 @@ export function useEvents(
   const isLoadingSports = !sports && !error;
   const isValidatingSports = isValidating;
 
-  // Grouper les événements par date
   const eventsByDate = useMemo(() => {
     if (!sports) return {};
     return sports.units.reduce((acc: { [key: string]: Event[] }, event) => {
-      const date = new Date(event.startDate).toLocaleDateString();
+      const date = new Date(event.startDate).toLocaleDateString("fr-FR");
       if (!acc[date]) {
         acc[date] = [];
       }
@@ -38,7 +36,6 @@ export function useEvents(
     }, {});
   }, [sports]);
 
-  // Appliquer les filtres
   const filteredEventsByDate = useMemo(() => {
     const filtered: { [key: string]: Event[] } = {};
     for (const date in eventsByDate) {

@@ -10,6 +10,14 @@ interface EventDetailsProps {
   direct: any;
 }
 
+/*
+
+
+
+
+
+*/
+
 const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
   <div className="lg:min-h-24 min-h-8 text-base lg:mb-2 mb-1">
     <div className="lg:mb-2 mb-1 lg:text-lg text-sm">
@@ -19,6 +27,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
       <MapPin className="mr-1 size-3" /> {event.venueDescription}
     </p>
     <div className="flex lg:text-lg text-sm items-center mb-2">
+      
       {direct &&
         [
           EventStatus.Running,
@@ -30,7 +39,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
               href={direct.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center "
+              className="flex items-center py-5"
             >
               <div className="lg:size-8 size-5 mr-2">
                 <MonitorPlay className=" lg:size-8 size-6" />{" "}
@@ -39,9 +48,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
                 Regarder en direct sur
               </p>
               <Image
-                width={0}
-                height={0}
-                className="lg:size-12 size-8 ml-2"
+                width={800}
+                height={800}
+                className="size-8 ml-2 p-1"
                 src={
                   direct.channel.includes("france")
                     ? direct.logo.replace("-invert", "")

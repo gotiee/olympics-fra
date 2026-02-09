@@ -4,7 +4,7 @@ import { fetcher } from "@/utils/fetcher";
 import { Discipline } from "@/interfaces/Discipline";
 
 export function useDisciplines(searchTerm: string) {
-  const { data: disciplinesData } = useSWR<Discipline[]>(
+  const { data: disciplinesData } = useSWR<{ disciplines: Discipline[] }>(
     process.env.NEXT_PUBLIC_DISCIPLINES_API,
     fetcher
   );
@@ -15,10 +15,10 @@ export function useDisciplines(searchTerm: string) {
   useEffect(() => {
     if (!disciplinesData) return;
 
-    const filteredDisciplines = disciplinesData.filter(
+    const filteredDisciplines = disciplinesData.disciplines.filter(
       (discipline) =>
         searchTerm === "" ||
-        discipline.description.toLowerCase().includes(searchTerm.toLowerCase())
+        discipline.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const uniqueDisciplinesMap = new Map<
@@ -26,9 +26,9 @@ export function useDisciplines(searchTerm: string) {
       { value: string; label: string }
     >();
     filteredDisciplines.forEach((discipline) => {
-      uniqueDisciplinesMap.set(discipline.description, {
-        value: discipline.description,
-        label: discipline.description,
+      uniqueDisciplinesMap.set(discipline.name, {
+        value: discipline.name,
+        label: discipline.name,
       });
     });
 

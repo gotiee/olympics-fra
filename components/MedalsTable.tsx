@@ -58,25 +58,25 @@ const MedalsTable: React.FC = () => {
           <tbody>
             {medals.map((entry, index) => (
               <tr
-                key={entry.noc}
+                key={entry.organisation}
                 className={`border-b ${
-                  entry.noc === "FRA" ? "bg-green-200" : ""
+                  entry.organisation === "FRA" ? "bg-green-200" : ""
                 }`}
               >
                 <td className="p-2 text-center">{entry.rank}</td>
                 <td className="p-2 flex items-center">
                   <picture>
                     <img
-                      src={getFlagUrl(entry.noc)}
+                      src={getFlagUrl(entry.organisation)}
                       alt={entry.description}
                       className="w-8 mr-2"
                     />
                   </picture>
                   <p className="hidden lg:inline">{entry.description}</p>
                 </td>
-                <td className="p-2 text-center">{entry.gold}</td>
-                <td className="p-2 text-center">{entry.silver}</td>
-                <td className="p-2 text-center">{entry.bronze}</td>
+                <td className="p-2 text-center">{entry.medalsNumber[2]?.gold}</td>
+                <td className="p-2 text-center">{entry.medalsNumber[2]?.silver}</td>
+                <td className="p-2 text-center">{entry.medalsNumber[2]?.bronze}</td>
                 <td className="p-2 text-center">{entry.total}</td>
               </tr>
             ))}
