@@ -10,7 +10,7 @@ import {
   didCountryWinEventMedal,
   didCountryWinEvent,
 } from "@/utils/utils";
-import { FranceTv } from "@/interfaces/FranceTv";
+import { TV } from "@/interfaces/TV";
 import EventHeader from "./event-card/EventHeader";
 import EventDetails from "./event-card/EventDetails";
 import EventCompetitors from "./event-card/EventCompetitors";
@@ -19,22 +19,22 @@ import { cn } from "@/lib/utils";
 interface EventCardProps {
   event: Event;
   getIconUrl: (disciplineCode: string) => string | null;
-  franceTv: FranceTv | undefined;
+  tv: TV | undefined;
 }
 
 const EventCard: React.FC<EventCardProps> = React.memo(
-  ({ event, getIconUrl, franceTv }) => {
+  ({ event, getIconUrl, tv }) => {
     const [showCompetitors, setShowCompetitors] = useState(false);
     const [ref, { width, height }] = useMeasure();
-    const direct = useDirectLink(event, franceTv);
+    const directs = useDirectLink(event, tv);
     const toggleCompetitors = () => setShowCompetitors((prev) => !prev);
 
     const confettiRef = useRef<HTMLCanvasElement>(null);
 
     const medals = getMedalColor(
       didCountryWinEventMedal(event, "FRA")?.map(
-        (e: Competitor) => e.results?.medalType
-      )
+        (e: Competitor) => e.results?.medalType,
+      ),
     );
 
     const getStatusColor = (eventStatus: EventStatus): string => {
@@ -57,7 +57,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
       <div
         ref={ref as React.LegacyRef<HTMLDivElement>}
         className={cn(
-          `border p-4 rounded shadow relative ${statusColor} ${event.disciplineCode}`
+          `border p-4 rounded shadow relative ${statusColor} ${event.disciplineCode}`,
         )}
         key={event.id}
       >
@@ -73,7 +73,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
           </div>
         )}
         <EventHeader event={event} getIconUrl={getIconUrl} medals={medals} />
-        <EventDetails event={event} direct={direct} />
+        <EventDetails event={event} directs={directs} />
         <EventCompetitors
           event={event}
           showCompetitors={showCompetitors}
@@ -81,7 +81,7 @@ const EventCard: React.FC<EventCardProps> = React.memo(
         />
       </div>
     );
-  }
+  },
 );
 
 EventCard.displayName = "EventCard";

@@ -5,7 +5,6 @@ import { useMedalsTable } from "@/hooks/useMedalsTable";
 import { Medal } from "lucide-react";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
-import Image from "next/image";
 
 const getFlagUrl = (countryCode: string) => {
   if (!countryCode) return "";
@@ -15,6 +14,15 @@ const getFlagUrl = (countryCode: string) => {
 const MedalsTable: React.FC = () => {
   const [all, setAll] = useState(false);
   const medals = useMedalsTable(all);
+
+  const totalMedals = (medals: {
+    type: string;
+    gold: number;
+    silver: number;
+    bronze: number;
+    total: number;
+  }[]) => medals.find((entry:any) => entry.type === "Total")
+  
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
@@ -74,10 +82,10 @@ const MedalsTable: React.FC = () => {
                   </picture>
                   <p className="hidden lg:inline">{entry.description}</p>
                 </td>
-                <td className="p-2 text-center">{entry.medalsNumber[2]?.gold}</td>
-                <td className="p-2 text-center">{entry.medalsNumber[2]?.silver}</td>
-                <td className="p-2 text-center">{entry.medalsNumber[2]?.bronze}</td>
-                <td className="p-2 text-center">{entry.total}</td>
+                <td className="p-2 text-center">{totalMedals(entry.medalsNumber)?.gold}</td>
+                <td className="p-2 text-center">{totalMedals(entry.medalsNumber)?.silver}</td>
+                <td className="p-2 text-center">{totalMedals(entry.medalsNumber)?.bronze}</td>
+                <td className="p-2 text-center">{totalMedals(entry.medalsNumber)?.total}</td>
               </tr>
             ))}
           </tbody>

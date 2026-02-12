@@ -13,9 +13,6 @@ export interface MedalEntry {
     bronze: number;
     total: number;
   }[];
-  // gold: number;
-  // silver: number;
-  // bronze: number;
   total: number;
   disciplines: null;
 }

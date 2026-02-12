@@ -10,7 +10,7 @@ import MedalsTable from "@/components/MedalsTable";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { EventStatus } from "@/interfaces/Event";
 import LoadingBar from "react-top-loading-bar";
-import { useFranceTv } from "@/hooks/useFranceTv";
+import { useTv } from "@/hooks/useTv";
 
 export default function Home() {
   const router = useRouter();
@@ -31,7 +31,8 @@ export default function Home() {
   const { filteredEventsByDate, isLoadingSports, isValidatingSports } =
     useEvents(searchTerm, statusFilter, "FRA");
   const disciplines = useDisciplines(searchTerm);
-  const { franceTv } = useFranceTv();
+  const { tv } = useTv();
+
   const ref = useRef<any>(null);
   useEffect(() => {
     const handleScroll = () => {
@@ -101,7 +102,7 @@ export default function Home() {
 
   const toggleDay = (date: string) => {
     setCollapsedDays((prev) =>
-      prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date]
+      prev.includes(date) ? prev.filter((d) => d !== date) : [...prev, date],
     );
   };
 
@@ -161,7 +162,7 @@ export default function Home() {
                 <h1>Aucun événements</h1>
               )}
             <EventList
-              franceTv={franceTv}
+              tv={tv}
               filteredEventsByDate={filteredEventsByDate}
               toggleDay={toggleDay}
               isDayCollapsed={isDayCollapsed}

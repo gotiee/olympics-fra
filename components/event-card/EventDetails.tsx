@@ -4,21 +4,15 @@ import { MapPin, MonitorPlay } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { TVChannel } from "@/interfaces/TV";
+import { DirectLinkResult } from "@/hooks/useDirectLink";
 
 interface EventDetailsProps {
   event: Event;
-  direct: any;
+  directs: DirectLinkResult[];
 }
 
-/*
-
-
-
-
-
-*/
-
-const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
+const EventDetails: React.FC<EventDetailsProps> = ({ event, directs }) => (
   <div className="lg:min-h-24 min-h-8 text-base lg:mb-2 mb-1">
     <div className="lg:mb-2 mb-1 lg:text-lg text-sm">
       <p>{event.eventUnitName}</p>
@@ -26,15 +20,20 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
     <p className="flex lg:text-sm text-xs items-center">
       <MapPin className="mr-1 size-3" /> {event.venueDescription}
     </p>
-    <div className="flex lg:text-lg text-sm items-center mb-2">
-      
-      {direct &&
+    <div className="flex flex-col lg:text-lg text-sm  mb-2">
+      {directs &&
         [
           EventStatus.Running,
           EventStatus.Interupted,
           EventStatus.GettingReady,
-        ].includes(event.status) && (
-          <Button variant="outline" asChild className="p-2 h-8 mt-2">
+        ].includes(event.status) &&
+        directs.map((direct) => (
+          <Button
+            variant="outline"
+            asChild
+            className="p-2 h-8 mt-2"
+            key={direct.channelKey}
+          >
             <Link
               href={direct.link}
               target="_blank"
@@ -50,17 +49,13 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, direct }) => (
               <Image
                 width={800}
                 height={800}
-                className="size-8 ml-2 p-1"
-                src={
-                  direct.channel.includes("france")
-                    ? direct.logo.replace("-invert", "")
-                    : direct.logo
-                }
+                className="w-9 ml-2 p-1"
+                src={direct.logo}
                 alt="logo-chaine"
               />
             </Link>
           </Button>
-        )}
+        ))}
     </div>
   </div>
 );

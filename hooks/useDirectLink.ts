@@ -1,21 +1,40 @@
 import { Event } from "@/interfaces/Event";
-import { FranceTv, FranceTvChannel } from "@/interfaces/FranceTv";
+import { TV, TVChannel } from "@/interfaces/TV";
 import { useState, useEffect } from "react";
 
-const useDirectLink = (event: Event, franceTv?: FranceTv) => {
-  const [direct, setDirect] = useState<{
-    link: string;
-    channel: string;
-    showAd: boolean;
-    logo: string;
-  } | null>(null);
+export type DirectLinkResult = {
+  link: string;
+  channelKey: string;
+  logo: string;
+  title: string;
+};
+
+const useDirectsLinks = (event: Event | null, tv: TV | undefined) => {
+  const [directLinks, setDirectLinks] = useState<DirectLinkResult[]>([]);
 
   useEffect(() => {
-    if (!franceTv || !event) return;
+    if (!tv || !event) {
+      setDirectLinks([]);
+      return;
+    }
 
-    const channels = [
-      { key: "france2", id: "france-2", logo: process.env.NEXT_PUBLIC_FRANCE_2_LOGO || "" },
-      { key: "france3", id: "france-3", logo: process.env.NEXT_PUBLIC_FRANCE_3_LOGO || "" },
+    const channelsConfig = [
+      {
+        key: "france2",
+        logo: process.env.NEXT_PUBLIC_FRANCE_2_LOGO || "",
+      },
+      {
+        key: "france3",
+        logo: process.env.NEXT_PUBLIC_FRANCE_3_LOGO || "",
+      },
+      {
+        key: "eurosport1",
+        logo: process.env.NEXT_PUBLIC_EUROSPORT_1_LOGO || "",
+      },
+      {
+        key: "eurosport2",
+        logo: process.env.NEXT_PUBLIC_EUROSPORT_2_LOGO || "",
+      },
     ];
 
     const normalize = (str: string) =>
@@ -23,41 +42,44 @@ const useDirectLink = (event: Event, franceTv?: FranceTv) => {
         .toLowerCase()
         .replace("-", " ")
         .replace("volleyball de plage", "beach volley")
-        .replace("ball", "")
-        .replace("slalom", "");
+        .replace(/ball|slalom/gi, "")
+        .trim();
 
-    const excludedWords = ["cyclisme ", "kayak"];
-    const excludeWords = (str: string, words: string[]) =>
+    const excludedWords = ["cyclisme", "kayak"];
+    const removeExcludedWords = (str: string, words: string[]) =>
       words.reduce(
         (acc, word) => acc.replace(new RegExp(`\\b${word}\\b`, "gi"), ""),
-        str
+        str,
       );
 
-    const eventTitle = normalize(
-      excludeWords(event.disciplineName.toLowerCase(), excludedWords)
+    const normalizedEventDiscipline = normalize(
+      removeExcludedWords(event.disciplineName || "", excludedWords),
     );
 
+    const matches: DirectLinkResult[] = [];
 
-    for (const channel of channels) {
-      const tmp = franceTv as any;
-      const channelData = tmp[channel.key] as FranceTvChannel;
-      channelData.collections.filter((collection) => 
-        collection.label === "En direct"
-      ).forEach((collection) => {
-        const normalizedAdditionalTitle = normalize(collection.items[0].title || "");
-        if (normalizedAdditionalTitle.includes(eventTitle)) {
-          setDirect({
-            link: `${process.env.NEXT_PUBLIC_FRANCE_TV_API}${channel.id}${process.env.NEXT_PUBLIC_FRANCE_TV_API_ENDING}`,
-            channel: channel.id,
-            showAd: false,
-            logo: channel.logo,
+    for (const config of channelsConfig) {
+      const tvData = tv as any;
+      const channelData = tvData[config.key] as TVChannel | undefined;
+
+      if (channelData && channelData.title) {
+        const channelProgramTitle = normalize(channelData.title);
+
+        if (channelProgramTitle.includes(normalizedEventDiscipline)) {
+          matches.push({
+            link: channelData.url || "",
+            channelKey: config.key,
+            logo: config.logo,
+            title: channelData.title,
           });
         }
-      });
+      }
     }
-  }, [event, franceTv]);
 
-  return direct;
+    setDirectLinks(matches);
+  }, [event, tv]);
+
+  return directLinks;
 };
 
-export default useDirectLink;
+export default useDirectsLinks;

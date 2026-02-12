@@ -8,24 +8,18 @@ import {
 import { EventCard } from "@/components/EventCard";
 import { Event } from "@/interfaces/Event";
 import { firstLetterToUpperCase, getDateFromString } from "@/utils/utils";
-import { FranceTv } from "@/interfaces/FranceTv";
+import { TV } from "@/interfaces/TV";
 
 interface EventListProps {
   readonly filteredEventsByDate: { [key: string]: Event[] };
   readonly toggleDay: (date: string) => void;
   readonly isDayCollapsed: (date: string) => boolean;
   readonly getIconUrl: (disciplineCode: string) => string;
-  readonly franceTv: FranceTv | undefined;
+  readonly tv: TV | undefined;
 }
 
 const EventList: React.FC<EventListProps> = React.memo(
-  ({
-    filteredEventsByDate,
-    toggleDay,
-    isDayCollapsed,
-    getIconUrl,
-    franceTv,
-  }) => (
+  ({ filteredEventsByDate, toggleDay, isDayCollapsed, getIconUrl, tv }) => (
     <>
       {Object.entries(filteredEventsByDate).map(([date, events]) => (
         <div key={date} className="mb-2">
@@ -40,7 +34,7 @@ const EventList: React.FC<EventListProps> = React.memo(
                 {firstLetterToUpperCase(
                   new Intl.DateTimeFormat("fr-FR", {
                     dateStyle: "full",
-                  }).format(new Date(getDateFromString(date)))
+                  }).format(new Date(getDateFromString(date))),
                 )}
               </AccordionTrigger>
               <AccordionContent>
@@ -48,7 +42,7 @@ const EventList: React.FC<EventListProps> = React.memo(
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {events.map((event) => (
                       <EventCard
-                        franceTv={franceTv}
+                        tv={tv}
                         key={event.id}
                         event={event}
                         getIconUrl={getIconUrl}
@@ -62,7 +56,7 @@ const EventList: React.FC<EventListProps> = React.memo(
         </div>
       ))}
     </>
-  )
+  ),
 );
 
 EventList.displayName = "EventList";
