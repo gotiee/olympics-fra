@@ -28,7 +28,8 @@ export function didCountryWinEventMedal(
     (competitor) =>
       competitor.noc === countryCode &&
       competitor?.results &&
-      competitor?.results?.medalType !== ""
+      competitor.results?.medalType &&
+      competitor?.results.medalType !== ""
   );
 }
 
